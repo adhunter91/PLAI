@@ -1,9 +1,24 @@
 from app import create_app
+from waitress import serve
+import logging
 
 app = create_app()
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s',
+    handlers=[
+        logging.FileHandler("waitress.log"),
+        logging.StreamHandler()
+    ]
+)
+
+logger = logging.getLogger('waitress')
+#logger.setLevel(logger.DEBUG)
+
 
 if __name__ == "__main__":
-    from waitress import serve
-    serve(app, host="127.0.0.1", port=8000)
-    #app.run()
+    logger.info("Starting the Waitress server...")
+    serve(app, host="127.0.0.1", port=8331)
+    #app.run(host='127.0.0.1', port=8000, debug=True)
+
