@@ -7,6 +7,10 @@ __pycache__/
 venv/
 ENV/
 env/
+env_test/
+PLAI_dev_env/
+myenv/
+my_env/
 
 # Environment variables
 .env
