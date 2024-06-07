@@ -1,5 +1,5 @@
 import time
-from flask import Flask
+from flask import Flask, request, jsonify
 from supabase import create_client
 from config import Config
 from .webhooks import webhook_blueprint
@@ -54,6 +54,16 @@ def create_app(config_filename=None):
     @app.route('/home')
     def home_route():
         return "This is the home page!"
+
+    @app.route('/zohotest', methods=['GET', 'POST'])
+    def zoho_test():
+        if request.method == 'GET':
+            return jsonify({"message": "Get request received"})
+        elif request.method == 'POST':
+            data = request.get_json()
+            return jsonify({"message": "POST request received", "This is the received data": data})
+
+
 
     print(f"Application initialized in {time.time() - start_time:.3f} seconds.")
     #from app.routes import main as main_blueprint
