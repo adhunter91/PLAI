@@ -1,5 +1,8 @@
+import json
+
 from flask import Blueprint, request, jsonify, current_app
 from app import create_app
+from ..services.screener_processing import filter_data_by_skill, find_total_skills
 
 bp = Blueprint('routes', __name__)
 @bp.route('/')
@@ -11,17 +14,43 @@ def test_route():
 def home_route():
     return "This is the home page!"
 
-
-@bp.route('/zohotest', methods=['GET', 'POST'])
 def zoho_test():
     if request.method == 'GET':
-        curernt_app.logger.info(f"GET request args: {request.args}")
+        current_app.logger.info(f"GET request args: {request.args}")
+        data = request.args
         return jsonify({"message": "Get request received"})
     elif request.method == 'POST':
         data = request.get_json()
+        #print(f"This is how data variable appears: {data}")
         current_app.logger.info(f"POST request data: {request.json}")
         return jsonify({"message": "POST request received", "This is the received data": data})
+@bp.route('/zoho_calculate_score', methods=['GET', 'POST'])
+def zoho_calculate_score():
+    if request.method == 'GET':
+        current_app.logger.info(f"GET request args: {request.args}")
+        data = request.args
+        return jsonify({"message": "Get request received"})
+    elif request.method == 'POST':
+        data = request.get_json()
+        #print(f"This is how data variable appears: {data}")
+        filtered_data = filter_data_by_skill(data)
 
+        current_app.logger.info(f"POST request data: {request.json}")
+        current_app.logger.info(f"Filtered Data {filtered_data}")
+
+        skills_score = find_total_skills(filtered_data)
+
+        current_app.logger.info(f"Filtered Skills {skills_score}")
+        #current_app.logger.info(f"Converted Data: {converted_data}")
+        return jsonify({"message": "POST request received", "This is the received data": skills_score})
+
+#Receive results
+# Convert to format
+# Loop through Dictionary and assign to new dict based on matches
+# Count Score, all Yeses, count total entries
+# Send to Database with Scores: Table " DB"
+# Extract email, Add user profile contents, add as last question
+# Create user_ID
 
 # Error Handling and configuring
 
