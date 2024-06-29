@@ -1,5 +1,6 @@
 import time
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from supabase import create_client
 from config import Config
 import logging
@@ -20,6 +21,7 @@ def create_app(config_filename=None):
 
     app = Flask(__name__)
     print(f"Flask app instance created in {time.time() - start_time:.3f} seconds.")
+    CORS(app)
 
     if config_filename:
         app.config.from_pyfile(config_filename)

@@ -2,10 +2,12 @@ from app import create_app
 from waitress import serve
 import logging
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 load_dotenv()
 
 app = create_app()
+CORS(app)
 
 logging.basicConfig(
     level=logging.DEBUG,
