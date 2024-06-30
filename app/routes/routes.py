@@ -1,6 +1,13 @@
 
+import os
 from flask import Blueprint, request, jsonify, current_app
+from dotenv import load_dotenv, find_dotenv
 from ..services.screener_processing import filter_data_by_skill, find_total_skills
+from ..services.generate_story import generate_story
+import requests
+
+
+load_dotenv(find_dotenv())
 
 bp = Blueprint('routes', __name__)
 
@@ -14,6 +21,18 @@ def test_route():
 @bp.route('/home')
 def home_route():
     return "This is the home page!"
+
+
+@bp.route('/generate_story', methods=['POST'])
+def generate_story_endpoint():
+        data = request.json
+        score = data.get('score')
+
+        if score is None:
+            return jsonify({'error': 'Score is required'}), 400
+
+        story = generate_story(score)
+        return jsonify({'story': story})
 
 
 @bp.route('/zoho_test', methods=['GET', 'POST'])
@@ -47,6 +66,7 @@ def zoho_calculate_score():
         current_app.logger.info(f"Filtered Skills {skills_score}")
         # Maybe make this send one large data packet
         return jsonify({"message": "POST request received", "This is the received data": skills_score})
+
 
 
 @bp.route('/send_to_java', methods=['GET', 'POST'])
