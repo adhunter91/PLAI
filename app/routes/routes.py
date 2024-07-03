@@ -4,6 +4,7 @@ from flask import Blueprint, request, jsonify, current_app
 from dotenv import load_dotenv, find_dotenv
 from ..services.screener_processing import filter_data_by_skill, find_total_skills
 from ..services.generate_story import generate_story
+from ..services.skill_data import SkillData  # Ensure the correct path to your SkillData class
 import requests
 
 
@@ -58,9 +59,28 @@ def zoho_calculate_score():
         data = request.get_json()
         current_app.logger.info(f"POST request data: {request.json}")
         #print(f"This is how data variable appears: {data}")
+        skill_data = SkillData()
+        skill_data.preprocess_screener(data)
+
+        skill_data.print_skills()
+        skill_data.print_data()
+
+        # Convert skill values to binary and summarize
+        #binary_values = skill_data.convert_skill_values_to_binary("language_and_literacy", "alphabet_knowledge")
+        #current_app.logger.info(f"Binary Values: {binary_values}")
+
+        alphabet_knowledge_score = skill_data.calculate_score_in_category("language_and_literacy", "alphabet_knowledge")
+        current_app.logger.info(f"Binary Summary: {alphabet_knowledge_score}")
+        #values = skill_data.get_all_values_from_category('language_and_literacy', 'alphabet_knowledge')
+        #current_app.logger.info(f"Summary of category: {values}")
+
+        #summary = skill_data.summarize_category("language_and_literacy", "print_knowledge")
+       # current_app.logger.info(f"Summary of category: {summary}")
 
         filtered_data = filter_data_by_skill(data)
+
         current_app.logger.info(f"Filtered Data {filtered_data}")
+        print(f"Filtered Data {filtered_data}")
 
         skills_score = find_total_skills(filtered_data)
         current_app.logger.info(f"Filtered Skills {skills_score}")

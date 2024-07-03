@@ -45,7 +45,7 @@ def find_total_skills(data: dict[str, str]) -> dict[str, any]:
             prefix_skills[prefix] = value
             prefix_counts[prefix] = 1
 
-        #print(f"Current Prefix value: {prefix_skills}")
+        print(f"Current Prefix value: {prefix_skills}")
         for prefix in prefix_skills:
             matched = prefix_skills[prefix]
             total = prefix_counts[prefix]
