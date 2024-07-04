@@ -58,34 +58,51 @@ def zoho_calculate_score():
     elif request.method == 'POST':
         data = request.get_json()
         current_app.logger.info(f"POST request data: {request.json}")
+
         #print(f"This is how data variable appears: {data}")
         skill_data = SkillData()
-        skill_data.preprocess_screener(data)
 
-        skill_data.print_skills()
+        skill_data.preprocess_screener(data)
+        email = skill_data.extract_email_from_webhook(data)
+        current_app.logger.info(f"Extracted Email: {email}")
+
+        user_id = skill_data.initialize_user_tmp(email)
+        current_app.logger.info(f"Initialized User_id: {user_id}")
+
+        #skill_data.print_skills()
         skill_data.print_data()
 
         # Convert skill values to binary and summarize
         #binary_values = skill_data.convert_skill_values_to_binary("language_and_literacy", "alphabet_knowledge")
         #current_app.logger.info(f"Binary Values: {binary_values}")
 
+        phonological_awareness_score = skill_data.calculate_score_in_category("language_and_literacy", "phonological_awareness")
+        print_knowledge_score = skill_data.calculate_score_in_category("language_and_literacy", "print_knowledge")
         alphabet_knowledge_score = skill_data.calculate_score_in_category("language_and_literacy", "alphabet_knowledge")
-        current_app.logger.info(f"Binary Summary: {alphabet_knowledge_score}")
-        #values = skill_data.get_all_values_from_category('language_and_literacy', 'alphabet_knowledge')
-        #current_app.logger.info(f"Summary of category: {values}")
+        comprehension_score = skill_data.calculate_score_in_category("language_and_literacy", "comprehension")
+        text_structure_score = skill_data.calculate_score_in_category("language_and_literacy", "text_structure")
+        writing_score = skill_data.calculate_score_in_category("language_and_literacy", "writing")
 
-        #summary = skill_data.summarize_category("language_and_literacy", "print_knowledge")
-       # current_app.logger.info(f"Summary of category: {summary}")
+        current_app.logger.info(f"Phonological Awareness Summary: {phonological_awareness_score}")
+        current_app.logger.info(f"Print Knowledge Summary: {print_knowledge_score}")
+        current_app.logger.info(f"Alphabet Knowledge Summary: {alphabet_knowledge_score}")
+        current_app.logger.info(f"Comprehension Summary: {comprehension_score}")
+        current_app.logger.info(f"Text Structure Summary: {text_structure_score}")
+        current_app.logger.info(f"Writing Summary: {writing_score}")
 
-        filtered_data = filter_data_by_skill(data)
+        all_score_categories = skill_data.calculate_score_in_all_categories()
+        skill_data.insert_scores_by_category_into_db(user_id, all_score_categories)
+        skill_data.upload_all_skill_values_to_db(user_id)
 
-        current_app.logger.info(f"Filtered Data {filtered_data}")
-        print(f"Filtered Data {filtered_data}")
+       # filtered_data = filter_data_by_skill(data)
 
-        skills_score = find_total_skills(filtered_data)
-        current_app.logger.info(f"Filtered Skills {skills_score}")
+       # current_app.logger.info(f"Filtered Data {filtered_data}")
+        #print(f"Filtered Data {filtered_data}")
+
+        #skills_score = find_total_skills(filtered_data)
+        #current_app.logger.info(f"Filtered Skills {skills_score}")
         # Maybe make this send one large data packet
-        return jsonify({"message": "POST request received", "This is the received data": skills_score})
+        return jsonify({"message": "POST request received", "This is the received data": all_score_categories})
 
 
 
